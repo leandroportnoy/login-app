@@ -1,11 +1,62 @@
 import React, { ChangeEvent, FC, FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { doAuth, fetchLogin } from "../../services/Auth";
+import styled from "styled-components";
+import { AuthRequest } from "../../models/AuthRequest";
 
 interface Error {
     username?: string,
     password?: string
 }
+
+
+const Container = styled.div`
+  text-align: center;
+  padding: 20px;
+`;
+
+const FormWrapper = styled.div`
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+`;
+
+const Title = styled.h2`
+  font-size: 24px;
+  margin-bottom: 20px;
+`;
+
+const InputField = styled.div`
+  margin-bottom: 15px;
+  input {
+    width: 80%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+  }
+`;
+
+const ErrorMessage = styled.span`
+  color: red;
+  font-weight: bold;
+  display: block;
+  margin-top: 5px;
+`;
+
+const SubmitButton = styled.button`
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+`;
 
 const Login: FC = () => {
     const navigate = useNavigate();
@@ -14,6 +65,10 @@ const Login: FC = () => {
         username: '',
         password: '',
     });
+
+    const [networkError, setNetworkError] = useState({
+        message: ''
+    })
 
     const [errors, setErrors] = useState<Error>({});
 
@@ -29,48 +84,68 @@ const Login: FC = () => {
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        setErrors(({
-            ...errors,
+        const newErrors = {
             username: fields.username.trim() === '' ? 'Usuário é obrigatório' : '',
             password: fields.password.trim() === '' ? 'A senha é obrigatória' : ''
-        }));
+        };
+
+        setErrors(newErrors);
+        setNetworkError(networkError);
 
         if (!errors.username && !errors.password) {
-            navigate("/profile");
+            const authRequest: AuthRequest = {
+                username: fields.username,
+                password: fields.password,
+            };
+
+            const response = fetchLogin(authRequest)
+                .then((response) => {
+                    console.log(response);
+                    networkError.message = '';
+                })
+                .catch((error) => {
+                    networkError.message = "Usuário e/ou senha estão inválidos";
+                    console.error('There was a problem with the Axios request:', error);
+                    throw error;
+                })
         }
     };
 
     return (
-        <div>
-            <h2>Login</h2>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <input
-                        type="text"
-                        id="username"
-                        name="username"
-                        placeholder="Usuário"
-                        value={fields.username}
-                        onChange={handleChange}
-                    />
-                    {errors.username && <span className="error"> <b>{errors.username}</b></span>}
-                </div>
-                <div>
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        placeholder="Senha"
-                        value={fields.password}
-                        onChange={handleChange}
-                    />
-                    {errors.password && <span className="error"> <b>{errors.password}</b></span>}
-                </div>
-                <div>
-                    <button type="submit">Login</button>
-                </div>
-            </form>
-        </div>
+        <Container>
+            <FormWrapper>
+                <Title>Login</Title>
+                <form onSubmit={handleSubmit}>
+                    <InputField>
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            placeholder="Usuário"
+                            value={fields.username}
+                            onChange={handleChange}
+                        />
+                        {errors.username && <ErrorMessage>{errors.username}</ErrorMessage>}
+                    </InputField>
+                    <InputField>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Senha"
+                            value={fields.password}
+                            onChange={handleChange}
+                        />
+                        {errors.password && <ErrorMessage>{errors.password}</ErrorMessage>}
+                    </InputField>
+                    <div>
+                        <SubmitButton type="submit">Login</SubmitButton>
+                    </div>
+                    {networkError.message && <ErrorMessage>{networkError.message}</ErrorMessage>}
+                </form>
+            </FormWrapper>
+        </Container>
+
     )
 }
 

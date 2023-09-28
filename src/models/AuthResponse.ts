@@ -1,3 +1,5 @@
+import { StatusError } from "./StatusError";
+
 export interface AuthResponse {
     id: number;
     username: string;
@@ -7,4 +9,5 @@ export interface AuthResponse {
     gender: string;
     image: string;
     token: string;
+    error: StatusError;
 }

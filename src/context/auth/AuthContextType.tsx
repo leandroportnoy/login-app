@@ -1,11 +1,15 @@
-import { createContext } from 'react';
-import { AuthRequest } from '../../models/AuthRequest';
-import { AuthResponse } from '../../models/AuthResponse';
+// import { createContext, useState } from 'react';
 
-export type AuthContextType = {
-    user: AuthRequest | null;
-    signin: (email: string, password: string) => Promise<AuthResponse>;
-    signout: () => void;
-}
+// const AuthContext = createContext({});
 
-export const AuthContext = createContext<AuthContextType>(null!);
+// export const AuthProvider = ({ children }) => {
+// 	const [auth, setAuth] = useState({});
+
+// 	return (
+// 		<AuthContext.Provider value={{ auth, setAuth }}>
+// 			{children}
+// 		</AuthContext.Provider>
+// 	);
+// };
+
+// export default AuthContext;
