@@ -59,18 +59,13 @@ const SubmitButton = styled.button`
 `;
 
 const Login: FC = () => {
+
     const navigate = useNavigate();
 
-    const [fields, setFields] = useState({
-        username: '',
-        password: '',
-    });
+    const [fields, setFields] = useState({ username: '', password: '' });
+    const [errors, setErrors] = useState({ username: '', password: '' });
+    const [networkError, setNetworkError] = useState({ message: '' });
 
-    const [networkError, setNetworkError] = useState({
-        message: ''
-    })
-
-    const [errors, setErrors] = useState<Error>({});
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -81,7 +76,7 @@ const Login: FC = () => {
         }));
     };
 
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         const newErrors = {
@@ -90,24 +85,23 @@ const Login: FC = () => {
         };
 
         setErrors(newErrors);
-        setNetworkError(networkError);
+        setNetworkError({ message: '' });
 
-        if (!errors.username && !errors.password) {
-            const authRequest: AuthRequest = {
+        if (!newErrors.username && !newErrors.password) {
+            console.log('aqui')
+            const authRequest = {
                 username: fields.username,
                 password: fields.password,
             };
 
-            const response = fetchLogin(authRequest)
-                .then((response) => {
-                    console.log(response);
-                    networkError.message = '';
-                })
-                .catch((error) => {
-                    networkError.message = "Usuário e/ou senha estão inválidos";
-                    console.error('There was a problem with the Axios request:', error);
-                    throw error;
-                })
+            try {
+                const response = await fetchLogin(authRequest);
+                console.log(response);
+                // Handle successful login here
+            } catch (error) {
+                setNetworkError({ message: 'Usuário e/ou senha estão inválidos' });
+                console.error('There was a problem with the Axios request:', error);
+            }
         }
     };
 
