@@ -1,12 +1,12 @@
 import { AuthRequest } from "../models/AuthRequest";
-import { AuthResponse } from "../models/AuthResponse";
+import { UserData } from "../models/UserData";
 import { apiClient } from "./axios";
 
 export const fetchLogin = async (
     authRequest: AuthRequest
-): Promise<AuthResponse> => {
+): Promise<UserData> => {
     try {
-        const response = await apiClient.post<AuthResponse>("/auth/login", {
+        const response = await apiClient.post<UserData>("/auth/login", {
             username: authRequest.username,
             password: authRequest.password,
         });

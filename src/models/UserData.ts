@@ -1,6 +1,4 @@
-import { StatusError } from "./StatusError";
-
-export interface AuthResponse {
+export interface UserData {
     id: number;
     username: string;
     email: string;
@@ -9,5 +7,4 @@ export interface AuthResponse {
     gender: string;
     image: string;
     token: string;
-    error: StatusError;
 }
